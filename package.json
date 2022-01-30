@@ -12,6 +12,7 @@
     "yargs": "^15.3.1"
   },
   "devDependencies": {
+    "parcel": "^2.2.1",
     "sass": "^1.26.10"
   }
 }

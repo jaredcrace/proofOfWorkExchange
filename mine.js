@@ -1,29 +1,45 @@
 const Block = require('./models/Block');
+const Blockchain = require('./models/Blockchain');
 const Transaction = require('./models/Transaction');
 const UTXO = require('./models/UTXO');
 const db = require('./db');
+const fs = require('fs');
 const {PUBLIC_KEY} = require('./config');
+const {DB_FILE} = require('./config');
 const TARGET_DIFFICULTY = BigInt("0x0" + "F".repeat(63));
 const BLOCK_REWARD = 10;
 
-let mining = true;
-mine();
+//let mining = true;
+//mine();
 
 function startMining() {
+  console.log('startMining now');
   mining = true;
   mine();
 }
 
 function stopMining() {
+  console.log(`STOP MINING called'`);
   mining = false;
+
+  // save database to the filesystem
+  console.log(db);
+
+  const data = JSON.stringify(db);
+  fs.writeFile(DB_FILE, data, (err) => {
+    if(err){
+      console.log('error writing file');
+      throw err;
+    }
+    console.log(`${DB_FILE} saved`);
+  })
+
 }
 
 function mine() {
   if(!mining) return;
 
   const block = new Block();
-
-  // TODO: add transactions from the mempool
 
   const coinbaseUTXO = new UTXO(PUBLIC_KEY, BLOCK_REWARD);
   const coinbaseTX = new Transaction([], [coinbaseUTXO]);
