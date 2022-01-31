@@ -6,7 +6,8 @@ const db = require('./db');
 const fs = require('fs');
 const {PUBLIC_KEY} = require('./config');
 const {DB_FILE} = require('./config');
-const TARGET_DIFFICULTY = BigInt("0x0" + "F".repeat(63));
+const TARGET_DIFFICULTY_EASY = BigInt("0x0" + "F".repeat(63));
+const TARGET_DIFFICULTY_HARD = BigInt("0x00000" + "F".repeat(59));
 const BLOCK_REWARD = 10;
 
 //let mining = true;
@@ -45,7 +46,14 @@ function mine() {
   const coinbaseTX = new Transaction([], [coinbaseUTXO]);
   block.addTransaction(coinbaseTX);
 
-  while(BigInt('0x' + block.hash()) >= TARGET_DIFFICULTY) {
+  var targetDifficulty = TARGET_DIFFICULTY_EASY;
+
+  // adjust difficulty after 10 blocks are mined
+  if(db.blockchain.blockHeight() > 10){
+    targetDifficulty = TARGET_DIFFICULTY_HARD;
+  }
+
+  while(BigInt('0x' + block.hash()) >= targetDifficulty) {
     block.nonce++;
   }
 
